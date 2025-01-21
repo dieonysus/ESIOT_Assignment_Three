@@ -1,6 +1,7 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 
+#define SENSOR_PIN 34
 // WiFi credentials
 const char* ssid = "";
 const char* password = "";
@@ -90,19 +91,24 @@ void setup() {
   randomSeed(analogRead(0));  
 }
 
-// The loop function runs continuously
+void getTemperature(){
+  int analogValue = analogRead(SENSOR_PIN);
+  float voltage = analogValue * 3.3 / 4095.0;  
+  float temperature = voltage * 100.0;  
+  Serial.println("Temperature: " + String(temperature) + " °C");
+  String temperatureStr = String(temperature, 2);  
+  Serial.println("Temperature: " + temperatureStr + " °C");
+  client.publish("temp", temperatureStr.c_str());
+  delay(1000);  
+}
+
+
 void loop() {
   if (!client.connected()) {
     connectToMQTT();
   }
-  client.loop();  // Ensure MQTT messages are processed
+  client.loop();  
 
-  // Publish a message to the topic
-  int randomNumber = random(-30, 31); 
-  String message = String(randomNumber);
-  Serial.print("Publishing message: ");
-  Serial.println(message);
-  client.publish("temp", message.c_str());
-
-  delay(1000);  
+  getTemperature();
+ 
 }
