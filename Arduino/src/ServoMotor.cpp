@@ -5,7 +5,7 @@ ServoMotor::ServoMotor(int pin){
  this->pin = pin;
 }
 
-ServoMotor::openPercentage(int percent){
+void ServoMotor::openPercentage(int percent){
   int angle = map(percent,0,100,0,90);
   motor.attach(pin);
   motor.write(angle);

@@ -6,7 +6,7 @@
 class ServoMotor{
   public:
   ServoMotor(int pin);
-  openPercentage(int percent);
+  void openPercentage(int percent);
 
   private:
   int pin;
