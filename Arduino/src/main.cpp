@@ -4,6 +4,7 @@
 #include "Potentiometer.h"
 #include "MsgService.h"
 #include "Lcd.h"
+#include "MemoryFree.h"
 
 #define button_pin 2
 #define pot_pin A0
@@ -18,7 +19,7 @@ ServoMotor* window;
 Potentiometer* potentiometer;
 Lcd* lcd;
 
-enum {automatic, manual} state ;
+enum {automatic, manual} mode ;
 
 void setup() {
   // put your setup code here, to run once:
@@ -31,14 +32,12 @@ void setup() {
   lcd->init();
 
   window->openPercentage(0);
-  state = automatic;
+  mode = automatic;
 
   lcd->setCursorTo(3,0);
-  lcd->print("state:Automatic");
+  lcd->print("Mode:");
+  lcd->print(mode);
 }
-
-
-
 
 
 void loop() {
@@ -55,36 +54,39 @@ void loop() {
 
     }else if(tag == "M"){
       if(value == "automatic"){
-        state = automatic;
+        mode = automatic;
       }else if(value == "manual"){
-        state = manual;
+        mode = manual;
       }else{
-        lcd->print("State is not set properly");
+        lcd->print("Mode is not set properly");
       }
 
     }else if(tag == "P"){
       percentage = value.toInt();
     }else{
       Serial.println("I didn't understand!");
-    }    
+    } 
+    delete msg;   
   }
       
-  switch(state){
+  switch(mode){
 
     case automatic:
-    lcd->updateState("Automatic"); 
-    lcd->updatePercentage(percentage); 
-    MsgService.sendMsg("S:automatic");
-
+  
     if(buttonIsPressed){
-      state = manual;
+      mode = manual;
+      
     }else{
       lcd->setCursorTo(0, 2);
       lcd->print(" ");
+      lcd->updateMode("Automatic"); 
+      Serial.println(freeMemory());
+      lcd->updatePercentage(percentage);
       if(percentage != lastPercentage){
       lastPercentage = percentage;
       lcd->updatePercentage(lastPercentage);
       window->openPercentage(lastPercentage);
+      
     }
     }
     break;
@@ -92,13 +94,15 @@ void loop() {
     case manual:
     
     if(buttonIsPressed){
-      state = automatic;
+      mode = automatic;
       lcd->clearScreen();
+      MsgService.sendMsg("M:automatic");
     }else{
-      lcd->updateState("Manual");
+      MsgService.sendMsg("M:manual");
+      lcd->updateMode("Manual");
       lcd->updatePercentage(lastPercentage);
       lcd->updateTemp(temperature);
-      MsgService.sendMsg("S:manual");
+     
       
       int potPercentage = potentiometer->percentageValue();
 

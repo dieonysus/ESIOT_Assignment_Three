@@ -11,10 +11,10 @@ void Lcd::init(){
   lcd.backlight();
 }
 
-void Lcd::updateState(String state){
+void Lcd::updateMode(String state){
   lcd.clear();
   lcd.setCursor(3,0);
-  lcd.print("state:");
+  lcd.print("Mode:");
   lcd.print(state);
 }
 
