@@ -7,7 +7,7 @@ Lcd::Lcd(uint8_t address, uint8_t columns, uint8_t rows) : lcd(address, columns,
 }
 
 void Lcd::init(){
-  lcd.begin(20,4);
+  lcd.init();
   lcd.backlight();
 }
 

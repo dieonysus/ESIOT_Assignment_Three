@@ -35,7 +35,6 @@ void setup() {
 
   lcd->setCursorTo(3,0);
   lcd->print("state:Automatic");
-  Serial.println("Hello Friend!");
 }
 
 
@@ -54,7 +53,7 @@ void loop() {
     if(tag == "T"){
       temperature = value.toInt();
 
-    }else if(tag == "S"){
+    }else if(tag == "M"){
       if(value == "automatic"){
         state = automatic;
       }else if(value == "manual"){
