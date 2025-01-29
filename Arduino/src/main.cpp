@@ -77,6 +77,7 @@ void loop() {
       mode = manual;
       
     }else{
+      MsgService.sendMsg("M:automatic");
       lcd->setCursorTo(0, 2);
       lcd->print(" ");
       lcd->updateMode("Automatic"); 
@@ -85,8 +86,7 @@ void loop() {
       if(percentage != lastPercentage){
       lastPercentage = percentage;
       lcd->updatePercentage(lastPercentage);
-      window->openPercentage(lastPercentage);
-      
+      window->openPercentage(lastPercentage); 
     }
     }
     break;
@@ -96,7 +96,6 @@ void loop() {
     if(buttonIsPressed){
       mode = automatic;
       lcd->clearScreen();
-      MsgService.sendMsg("M:automatic");
     }else{
       MsgService.sendMsg("M:manual");
       lcd->updateMode("Manual");
