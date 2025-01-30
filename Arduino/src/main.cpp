@@ -50,7 +50,6 @@ void loop() {
 
     if(tag == "T"){
       temperature = value.toInt();
-
     }else if(tag == "M"){
       if(value == "automatic"){
         mode = automatic;
@@ -79,7 +78,7 @@ void loop() {
     }else{
       lcd->setCursorTo(0, 2);
       lcd->print(" ");
-      lcd->updateMode("Automatic"
+      lcd->updateMode("Automatic");
       if(percentage != lastPercentage){
       lastPercentage = percentage;
       lcd->updatePercentage(lastPercentage);
