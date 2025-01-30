@@ -28,11 +28,11 @@ void setup() {
   window = new ServoMotor(servo_pin);
   potentiometer = new Potentiometer(pot_pin);
   lcd = new Lcd(0x27,20,4);
+
   lcd->init();
-
   window->openPercentage(0);
-  mode = automatic;
 
+  mode = automatic;
   lcd->setCursorTo(3,0);
   lcd->print("Mode:");
   lcd->print(mode);
@@ -56,9 +56,8 @@ void loop() {
       }else if(value == "manual"){
         mode = manual;
       }else{
-        lcd->print("Mode is not set properly");
+        Serial.println("Mode is not set properly");
       }
-
     }else if(tag == "P"){
       percentage = value.toInt();
     }else{
@@ -79,9 +78,9 @@ void loop() {
       lcd->setCursorTo(0, 2);
       lcd->print(" ");
       lcd->updateMode("Automatic");
+      lcd->updatePercentage(lastPercentage);
       if(percentage != lastPercentage){
       lastPercentage = percentage;
-      lcd->updatePercentage(lastPercentage);
       window->openPercentage(lastPercentage); 
     }
     }
