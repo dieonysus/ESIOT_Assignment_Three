@@ -4,7 +4,6 @@
 #include "Potentiometer.h"
 #include "MsgService.h"
 #include "Lcd.h"
-#include "MemoryFree.h"
 
 #define button_pin 2
 #define pot_pin A0
@@ -75,14 +74,12 @@ void loop() {
   
     if(buttonIsPressed){
       mode = manual;
-      
+      MsgService.sendMsg("M:manual");
+      lcd->clearScreen();
     }else{
-      MsgService.sendMsg("M:automatic");
       lcd->setCursorTo(0, 2);
       lcd->print(" ");
-      lcd->updateMode("Automatic"); 
-      Serial.println(freeMemory());
-      lcd->updatePercentage(percentage);
+      lcd->updateMode("Automatic"
       if(percentage != lastPercentage){
       lastPercentage = percentage;
       lcd->updatePercentage(lastPercentage);
@@ -95,14 +92,13 @@ void loop() {
     
     if(buttonIsPressed){
       mode = automatic;
+      MsgService.sendMsg("M:automatic");
       lcd->clearScreen();
     }else{
-      MsgService.sendMsg("M:manual");
       lcd->updateMode("Manual");
       lcd->updatePercentage(lastPercentage);
       lcd->updateTemp(temperature);
      
-      
       int potPercentage = potentiometer->percentageValue();
 
       if(potPercentage != lastPercentage){
@@ -111,8 +107,9 @@ void loop() {
         window->openPercentage(lastPercentage);
         String percentMsg = "P:" + String(lastPercentage);
         MsgService.sendMsg(percentMsg);
-    }   
-  }
+    }  
+    }
+    break;
   }
  delay(200);
 }
