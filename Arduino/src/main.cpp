@@ -4,14 +4,16 @@
 #include "Potentiometer.h"
 #include "MsgService.h"
 #include "Lcd.h"
+#include "MemoryFree.h"
 
 #define button_pin 2
 #define pot_pin A0
 #define servo_pin 10
 
-int lastPercentage = 0;
-int percentage = 0;
-int temperature = 0;
+int lastPercentage;
+int percentage;
+int temperature ;
+int lastPotPercentage;
 
 Button* btn;
 ServoMotor* window;
@@ -24,7 +26,7 @@ void setup() {
   // put your setup code here, to run once:
   MsgService.init();
   
-  btn = new Button(button_pin);
+  btn = new Button(button_pin,20);
   window = new ServoMotor(servo_pin);
   potentiometer = new Potentiometer(pot_pin);
   lcd = new Lcd(0x27,20,4);
@@ -33,9 +35,16 @@ void setup() {
   window->openPercentage(0);
 
   mode = automatic;
-  lcd->setCursorTo(3,0);
-  lcd->print("Mode:");
-  lcd->print(mode);
+  lcd->updateMode("Automatic");
+}
+
+void controlWindow(){
+   if(percentage != lastPercentage){
+      lastPercentage = percentage;
+      window->openPercentage(lastPercentage); 
+    }
+    lcd->updatePercentage(lastPercentage);
+    
 }
 
 
@@ -45,8 +54,9 @@ void loop() {
   bool buttonIsPressed = btn->isPressed();
   if(MsgService.isMsgAvailable()){
     Msg* msg = MsgService.receiveMsg();
-    String tag = msg->getContent().substring(0,1);
-    String value = msg->getContent().substring(2);
+    if(msg != NULL){
+      String tag = msg->getContent().substring(0,1);
+      String value = msg->getContent().substring(2);
 
     if(tag == "T"){
       temperature = value.toInt();
@@ -63,7 +73,10 @@ void loop() {
     }else{
       Serial.println("I didn't understand!");
     } 
-    delete msg;   
+    delete msg;
+    }
+    
+       
   }
       
   switch(mode){
@@ -78,11 +91,8 @@ void loop() {
       lcd->setCursorTo(0, 2);
       lcd->print(" ");
       lcd->updateMode("Automatic");
-      lcd->updatePercentage(lastPercentage);
-      if(percentage != lastPercentage){
-      lastPercentage = percentage;
-      window->openPercentage(lastPercentage); 
-    }
+      lcd->updatePercentage(percentage);
+      controlWindow();
     }
     break;
 
@@ -94,20 +104,24 @@ void loop() {
       lcd->clearScreen();
     }else{
       lcd->updateMode("Manual");
-      lcd->updatePercentage(lastPercentage);
       lcd->updateTemp(temperature);
      
       int potPercentage = potentiometer->percentageValue();
 
-      if(potPercentage != lastPercentage){
-        lastPercentage = potPercentage;
-        lcd->updatePercentage(lastPercentage);
-        window->openPercentage(lastPercentage);
-        String percentMsg = "P:" + String(lastPercentage);
+      if(potPercentage != lastPotPercentage){
+        lastPotPercentage = potPercentage;
+        lcd->updatePercentage(lastPotPercentage);
+        window->openPercentage(lastPotPercentage);
+        String percentMsg = "P:" + String(lastPotPercentage);
         MsgService.sendMsg(percentMsg);
-    }  
+        percentage = lastPotPercentage;
+       }else{
+        controlWindow();
+      }
     }
     break;
   }
+  String memory = "D:" + String(freeMemory());
+  MsgService.sendMsg(memory);
  delay(200);
 }
