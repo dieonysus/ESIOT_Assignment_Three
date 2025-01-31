@@ -12,14 +12,14 @@ int GREEN_PIN = 26;
 int RED_PIN = 32;
 
 // Definition of WiFi credentials 
-const char* ssid = "FASTWEB-F5FPEF";
-const char* password = "";
+const char* SSID = "FASTWEB-F5FPEF";
+const char* WIFI_PASSWORD = "";
 
 // Variables to connect to MQTT
-const char* mqtt_broker = "192.168.1.79"; 
-const int mqtt_port = 1883;
-const char* topic_temp ="temp";
-const char* topic_state ="state";
+const char* MQTT_BROKER = "192.168.1.79"; 
+const int MQTT_PORT = 1883;
+const char* TOPIC_TEMP ="temp";
+const char* TOPIC_STATE ="state";
 
 
 // Create a WiFi client for network communication
@@ -30,10 +30,10 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 
 
-// Function to recieve  message from topic state
-void callback(char* topic_state, byte* payload, unsigned int length) {
+// Function to recieve  message from topic state and change delay of sending temperature based on message recieved 
+void callback(char* TOPIC_STATE, byte* payload, unsigned int length) {
   Serial.print("\nMessage received on topic: ");
-  Serial.println(topic_state);
+  Serial.println(TOPIC_STATE);
   Serial.print("Message: ");
   String message = "";  
   for (unsigned int i = 0; i < length; i++) {
@@ -43,6 +43,16 @@ void callback(char* topic_state, byte* payload, unsigned int length) {
   Serial.println();  
   Serial.print("Full message as String: ");
   Serial.println(message);
+   if (message == "NORMAL") {
+      TEMP_DELAY = 5000;  
+  } else if (message == "HOT") {
+      TEMP_DELAY = 3000;  
+  } else if (message == "TOO HOT") {
+      TEMP_DELAY = 1000;  
+  }
+    else if (message == "ALARM") {
+      TEMP_DELAY = 1000;
+  }
 }
 
 
@@ -50,13 +60,12 @@ void callback(char* topic_state, byte* payload, unsigned int length) {
 void setupWiFi() {
   Serial.println("Configuring WiFi...");
   Serial.println("Connecting to WiFi...");
-  WiFi.begin(ssid, password);
-  int attempts = 0;
-
-  while (WiFi.status() != WL_CONNECTED && attempts < 5) {  
+  WiFi.begin(SSID, WIFI_PASSWORD);
+  int CONNECTION_ATTEMPTS = 0;
+  while (WiFi.status() != WL_CONNECTED && CONNECTION_ATTEMPTS < 5) {  
     delay(500);
     Serial.print(".");
-    attempts++;
+    CONNECTION_ATTEMPTS++;
   }
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("Error: Failed to connect to WiFi"); 
@@ -90,13 +99,12 @@ void connectToMQTT() {
 void setup() {
   Serial.begin(115200);
   setupWiFi();
-  client.setServer(mqtt_broker, mqtt_port);
+  client.setServer(MQTT_BROKER, MQTT_PORT);
   client.setCallback(callback);  
   connectToMQTT();
 }
 
 // Function to setup LED lights
-
 void setLED(char* color) {
   pinMode(RED_PIN, OUTPUT);
   pinMode(GREEN_PIN, OUTPUT);
@@ -111,7 +119,6 @@ void setLED(char* color) {
 }
 
 // Function to calculate Temperature and publish to topic temp
-
 void getTemperature(){
   int analogValue = analogRead(TEMP_PIN);
   float voltage = (analogValue / 4095.0) * 5.0;  
