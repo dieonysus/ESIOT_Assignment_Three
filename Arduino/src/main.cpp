@@ -22,9 +22,19 @@ Lcd* lcd;
 
 enum {automatic, manual} mode ;
 
+String tag;
+String value;
+String percentMsg;
+
 void setup() {
   // put your setup code here, to run once:
   MsgService.init();
+  
+  Serial.begin(9600);
+
+  tag.reserve(10);
+  value.reserve(50);
+  percentMsg.reserve(30);
   
   btn = new Button(button_pin,20);
   window = new ServoMotor(servo_pin);
@@ -53,10 +63,15 @@ void loop() {
   // put your main code here, to run repeatedly:
   bool buttonIsPressed = btn->isPressed();
   if(MsgService.isMsgAvailable()){
+    
     Msg* msg = MsgService.receiveMsg();
-    if(msg != NULL){
-      String tag = msg->getContent().substring(0,1);
-      String value = msg->getContent().substring(2);
+    
+    tag = msg->getContent().substring(0,1);
+    value = msg->getContent().substring(2);
+    Serial.print("From arduino: ");
+    Serial.print(tag);
+    Serial.println(value);
+   
 
     if(tag == "T"){
       temperature = value.toInt();
@@ -66,17 +81,16 @@ void loop() {
       }else if(value == "manual"){
         mode = manual;
       }else{
-        Serial.println("Mode is not set properly");
+        //Serial.println("Mode is not set properly");
       }
     }else if(tag == "P"){
       percentage = value.toInt();
     }else{
-      Serial.println("I didn't understand!");
+      //Serial.println("I didn't understand!");
     } 
-    delete msg;
-    }
-    
-       
+    delete msg;  
+    tag = "";
+    value = ""; 
   }
       
   switch(mode){
@@ -103,8 +117,8 @@ void loop() {
       MsgService.sendMsg("M:automatic");
       lcd->clearScreen();
     }else{
-      lcd->updateMode("Manual");
-      lcd->updateTemp(temperature);
+     lcd->updateMode("Manual");
+     lcd->updateTemp(temperature);
      
       int potPercentage = potentiometer->percentageValue();
 
@@ -112,8 +126,10 @@ void loop() {
         lastPotPercentage = potPercentage;
         lcd->updatePercentage(lastPotPercentage);
         window->openPercentage(lastPotPercentage);
-        String percentMsg = "P:" + String(lastPotPercentage);
+        percentMsg = "P:";
+        percentMsg.concat(lastPotPercentage);
         MsgService.sendMsg(percentMsg);
+        percentMsg = "";
         percentage = lastPotPercentage;
        }else{
         controlWindow();
@@ -121,7 +137,7 @@ void loop() {
     }
     break;
   }
-  String memory = "D:" + String(freeMemory());
-  MsgService.sendMsg(memory);
- delay(200);
+  lcd->setCursorTo(1,1);
+  lcd->print(freeMemory());
+  delay(10);
 }

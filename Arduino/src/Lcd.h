@@ -9,7 +9,7 @@ class Lcd{
   public:
   Lcd(uint8_t address, uint8_t columns, uint8_t rows);
   void init();
-  void updateMode(String state);
+  void updateMode(const String& state);
   void updatePercentage(int percent);
   void updateTemp(int temp);
   void print(const String& line);

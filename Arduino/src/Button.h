@@ -3,7 +3,7 @@
 
 class Button{
   public:
-   Button(int pin, unsigned long debounceTime = 100);
+   Button(int pin, unsigned long debounceTime = 20);
    
    virtual bool isPressed();
 

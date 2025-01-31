@@ -11,7 +11,7 @@ void Lcd::init(){
   lcd.backlight();
 }
 
-void Lcd::updateMode(String state){
+void Lcd::updateMode(const String& state){
   lcd.clear();
   lcd.setCursor(3,0);
   lcd.print("Mode:");

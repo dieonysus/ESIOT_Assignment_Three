@@ -1,7 +1,7 @@
 #include "Button.h"
 #include <Arduino.h>
 
-Button::Button(int pin,unsigned long debounceTime = 100){
+Button::Button(int pin, unsigned long debounceTime){
   this->pin = pin;
   buttonState = LOW;
   lastButtonState = LOW;
