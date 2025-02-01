@@ -23,7 +23,7 @@ Msg* MsgServiceClass::receiveMsg(){
 
 void MsgServiceClass::init(){
   Serial.begin(9600);
-  content.reserve(50);
+  content.reserve(256);
   content = "";
   currentMsg = NULL;
   msgAvailable = false;  
@@ -45,6 +45,7 @@ void serialEvent() {
       content += ch;
     }
   }
+  //delay(5);
 }
 
 bool MsgServiceClass::isMsgAvailable(Pattern& pattern){
