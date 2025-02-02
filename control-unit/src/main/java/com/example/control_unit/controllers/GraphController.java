@@ -22,29 +22,38 @@ public class GraphController {
     }
 
     @GetMapping("/temperatureQueue")
-    public List<Float> getTemperatureQueue() {
-        List<Float> latestTemperatureValues = DataStorage.getInstance().getDataAsList();
-        return latestTemperatureValues;
+    public ResponseEntity<List<Float>> getTemperatureQueue() {
+        return ResponseEntity.ok(dataStorage.getTemperatureAsList());
     }
 
     @GetMapping("/averageTemperature")
-    public double getAverageTemperature() {
-        return dataStorage.getAverageTemperature();
+    public ResponseEntity<Double> getAverageTemperature() {
+        return ResponseEntity.ok(dataStorage.getAverageTemperature());
     }
 
     @GetMapping("/maxTemperature")
-    public double getMaxTemperature() {
-        return dataStorage.getMax();
+    public ResponseEntity<Float> getMaxTemperature() {
+        return ResponseEntity.ok(dataStorage.getMax());
     }
 
     @GetMapping("/minTemperature")
-    public double getMinTemperature() {
-        return dataStorage.getMin();
+    public ResponseEntity<Float> getMinTemperature() {
+        return ResponseEntity.ok(dataStorage.getMin());
     }
 
     @GetMapping("/state")
-    public State getState() {
-        return dataStorage.getState();
+    public ResponseEntity<State> getState() {
+        return ResponseEntity.ok(dataStorage.getState());
+    }
+
+    @GetMapping("/mode")
+    public ResponseEntity<Mode> getMode() {
+        return ResponseEntity.ok(dataStorage.getMode());
+    }
+
+    @GetMapping("/windowPercentage")
+    public ResponseEntity<Integer> getWindowPercentage() {
+        return ResponseEntity.ok(dataStorage.getWindowPercentage());
     }
 
     @PostMapping("/toggleMode")
@@ -59,16 +68,6 @@ public class GraphController {
         State normalState = State.NORMAL;
         dataStorage.setState(normalState);
         return normalState;
-    }
-
-    @GetMapping("/mode")
-    public ResponseEntity<String> getMode() {
-        return ResponseEntity.ok(dataStorage.getMode().toString());
-    }
-
-    @GetMapping("/windowPercentage")
-    public int getWindowPercentage() {
-        return dataStorage.getWindowPercentage();
     }
 
     @PostMapping("/setWindowPercentage")

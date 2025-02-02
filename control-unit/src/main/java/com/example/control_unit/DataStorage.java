@@ -17,12 +17,13 @@ public class DataStorage {
     private final BlockingQueue<Float> temperatureQueue = new LinkedBlockingQueue<>(MAX_SIZE);
     private double temperatureSum;
     private double temperatureCount;
-    private float max = 0;
+    private float max = -50;
     private float min = 50;
     private int windowPercentage = 0;
-    private long tooHotStartTime;
     private State state = State.NORMAL;
     private Mode mode = Mode.AUTOMATIC;
+
+    private long tooHotStartTime;
 
     private static final DataStorage INSTANCE = new DataStorage();
 
@@ -39,7 +40,7 @@ public class DataStorage {
         temperatureQueue.offer(data);
     }
 
-    public List<Float> getDataAsList() {
+    public List<Float> getTemperatureAsList() {
         return new ArrayList<>(temperatureQueue);
     }
 
