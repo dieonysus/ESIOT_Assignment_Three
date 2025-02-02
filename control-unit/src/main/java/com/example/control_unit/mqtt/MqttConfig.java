@@ -1,7 +1,6 @@
 package com.example.control_unit.mqtt;
 
-import com.example.control_unit.DataStorage;
-import com.example.control_unit.services.TemperatureService;
+import com.example.control_unit.services.DeviceIntegrationService;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -56,7 +55,7 @@ public class MqttConfig {
 
     @Bean
     @ServiceActivator(inputChannel = "mqttInputChannel")
-    public MessageHandler handler(TemperatureService temperatureService) {
+    public MessageHandler handler(DeviceIntegrationService temperatureService) {
         return message -> {
             String payload = message.getPayload().toString();
             temperatureService.processTemperature(payload);

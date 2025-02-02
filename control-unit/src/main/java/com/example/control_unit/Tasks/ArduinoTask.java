@@ -21,9 +21,9 @@ public class ArduinoTask {
             if (channel.isMsgAvailable()) {
                 String msg = channel.receiveMsg();
                 if (msg.startsWith("M:")) {
-                    arduinoService.checkModeChange(msg);
+                    arduinoService.receiveMode(msg);
                 } else if (msg.startsWith("P:")) {
-                    arduinoService.checkWindowPercentageChange(msg);
+                    arduinoService.receiveWindowPercentage(msg);
                 } else {
                     System.out.println(msg);
                 }
