@@ -29,6 +29,38 @@ void WindowControllerTask::init(){
   isButtonAlreadyPressed = false;
 }
 
+
+void WindowControllerTask::tick(){
+ changeModeOnButtonPress();
+ getDataFromSerial();
+
+ switch(mode){
+  case automatic:
+    if(lastMode == Manual ){
+     goInAutomaticMode();
+    }
+    updateWindowFromSerial();
+    break;
+
+  case manual:
+    if(lastMode == Automatic){
+     goInManualMode();
+    }
+     updateTemperature();
+
+    int potPercentage = potentiometer->getPercentageValue();
+
+    if(potPercentage != lastPotPercentage){
+     lastPotPercentage = potPercentage;
+     updateWindowFromPotentiometer();
+     sendPercentageToSerial();
+    }else{
+     updateWindowFromSerial();
+    }
+    break;
+  }
+}
+
 void WindowControllerTask::updateWindowFromSerial(){
  if(percentage != lastPercentage){
   lastPercentage = percentage;
@@ -107,35 +139,4 @@ void WindowControllerTask::goInAutomaticMode(){
   lcd->updateMode("Automatic");
   lcd->updatePercentage(percentage);
   MsgService.sendMsg("M:automatic");
-}
-
-void WindowControllerTask::tick(){
- changeModeOnButtonPress();
- getDataFromSerial();
-
- switch(mode){
-  case automatic:
-    if(lastMode == Manual ){
-     goInAutomaticMode();
-    }
-    updateWindowFromSerial();
-    break;
-
-  case manual:
-    if(lastMode == Automatic){
-     goInManualMode();
-    }
-     updateTemperature();
-
-    int potPercentage = potentiometer->getPercentageValue();
-
-    if(potPercentage != lastPotPercentage){
-     lastPotPercentage = potPercentage;
-     updateWindowFromPotentiometer();
-     sendPercentageToSerial();
-    }else{
-     updateWindowFromSerial();
-    }
-    break;
-  }
 }
