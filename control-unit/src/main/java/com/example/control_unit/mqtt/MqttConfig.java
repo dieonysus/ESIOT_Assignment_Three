@@ -55,10 +55,10 @@ public class MqttConfig {
 
     @Bean
     @ServiceActivator(inputChannel = "mqttInputChannel")
-    public MessageHandler handler(DeviceIntegrationService temperatureService) {
+    public MessageHandler handler(DeviceIntegrationService deviceIntegrationService) {
         return message -> {
             String payload = message.getPayload().toString();
-            temperatureService.processTemperature(payload);
+            deviceIntegrationService.updateSystemState(payload);
         };
     }
 

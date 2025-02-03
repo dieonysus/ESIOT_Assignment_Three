@@ -18,7 +18,7 @@ public class DeviceIntegrationService {
         this.esp32Service = esp32Service;
     }
 
-    public void processTemperature(String payload) {
+    public void updateSystemState(String payload) {
         float temperature = Float.parseFloat(payload);
         dataStorageService.processTemperature(temperature);
         esp32Service.sendState();
