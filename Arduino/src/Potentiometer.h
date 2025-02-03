@@ -4,7 +4,7 @@
 class Potentiometer{
   public:
   Potentiometer(int pin);
-  int percentageValue();
+  int getPercentageValue();
 
   private:
   int pin;

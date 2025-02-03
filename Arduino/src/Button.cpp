@@ -3,11 +3,12 @@
 
 Button::Button(int pin, unsigned long debounceTime){
   this->pin = pin;
+  pinMode(pin, INPUT);
   buttonState = LOW;
   lastButtonState = LOW;
   lastPressTime = 0;
   this->debounceTime = debounceTime ;
-  pinMode(pin, INPUT);
+  
 }
 
 bool Button::isPressed(){
