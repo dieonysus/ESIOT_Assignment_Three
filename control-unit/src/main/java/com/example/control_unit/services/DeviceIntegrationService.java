@@ -1,6 +1,6 @@
 package com.example.control_unit.services;
 
-import com.example.control_unit.DataStorage;
+import com.example.control_unit.enums.Mode;
 import org.springframework.stereotype.Service;
 
 import static com.example.control_unit.enums.Mode.AUTOMATIC;
@@ -8,32 +8,26 @@ import static com.example.control_unit.enums.Mode.AUTOMATIC;
 @Service
 public class DeviceIntegrationService {
 
-    private final DataStorage dataStorage = DataStorage.getInstance();
+    private final DataStorageService dataStorageService;
     private final ArduinoService arduinoService;
     private final Esp32Service esp32Service;
 
-    public DeviceIntegrationService(ArduinoService arduinoService, Esp32Service esp32Service) {
+    public DeviceIntegrationService(ArduinoService arduinoService, Esp32Service esp32Service, DataStorageService dataStorageService) {
+        this.dataStorageService = dataStorageService;
         this.arduinoService = arduinoService;
         this.esp32Service = esp32Service;
     }
 
     public void processTemperature(String payload) {
         float temperature = Float.parseFloat(payload);
-        processTemperature(temperature);
+        dataStorageService.processTemperature(temperature);
         esp32Service.sendState();
-        if (dataStorage.getMode() == AUTOMATIC) {
-            dataStorage.calculateWindowPercentage(temperature);
-            arduinoService.sendWindowPercentage(dataStorage.getWindowPercentage());
+        Mode currentMode = dataStorageService.getMode();
+        if (currentMode == AUTOMATIC) {
+            int windowPercentage = dataStorageService.calculateWindowPercentage(temperature);
+            arduinoService.sendWindowPercentage(windowPercentage);
         } else {
             arduinoService.sendTemperature(temperature);
         }
-    }
-
-    private void processTemperature(float temperature) {
-        dataStorage.addData(temperature);
-        dataStorage.addToSum(temperature);
-        dataStorage.increaseTemperatureCount();
-        dataStorage.updateMinAndMax(temperature);
-        dataStorage.updateState(temperature);
     }
 }

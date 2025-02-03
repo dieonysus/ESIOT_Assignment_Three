@@ -9,12 +9,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class DataStorage {
-    private static final int MAX_SIZE = 10;
-    private final long alarmDelay = 5000;
-    private final float temperatureThresholdFirst = 30;
-    private final float temperatureThresholdSecond = 40;
+    private static final int QUEUE_SIZE = 10;
 
-    private final BlockingQueue<Float> temperatureQueue = new LinkedBlockingQueue<>(MAX_SIZE);
+    private final BlockingQueue<Float> temperatureQueue = new LinkedBlockingQueue<>(QUEUE_SIZE);
     private double temperatureSum;
     private double temperatureCount;
     private float max = -50;
@@ -22,8 +19,6 @@ public class DataStorage {
     private int windowPercentage = 0;
     private State state = State.NORMAL;
     private Mode mode = Mode.AUTOMATIC;
-
-    private long tooHotStartTime;
 
     private static final DataStorage INSTANCE = new DataStorage();
 
@@ -33,44 +28,43 @@ public class DataStorage {
         return INSTANCE;
     }
 
-    public void addData(Float data) {
-        if (temperatureQueue.size() == MAX_SIZE) {
+    public void addTemperatureToQueue(Float data) {
+        if (temperatureQueue.size() == QUEUE_SIZE) {
             temperatureQueue.poll();
         }
         temperatureQueue.offer(data);
     }
 
-    public List<Float> getTemperatureAsList() {
-        return new ArrayList<>(temperatureQueue);
+    public double getTemperatureSum() {
+        return temperatureSum;
     }
 
-    public void addToSum(float temperature) {
-        temperatureSum += (double) temperature;
+    public void setTemperatureSum(double temperatureSum) {
+        this.temperatureSum = temperatureSum;
     }
 
-    public void increaseTemperatureCount() {
-        temperatureCount++;
+    public double getTemperatureCount() {
+        return temperatureCount;
     }
 
-    public double getAverageTemperature() {
-        return temperatureCount == 0 ? 9.9 : temperatureSum / temperatureCount;
+    public void setTemperatureCount(double temperatureCount) {
+        this.temperatureCount = temperatureCount;
     }
 
     public float getMax() {
         return max;
     }
 
+    public void setMax(float max) {
+        this.max = max;
+    }
+
     public float getMin() {
         return min;
     }
 
-    public void updateMinAndMax(float temperature) {
-        if (temperature > max) {
-            max = temperature;
-        }
-        if (temperature < min) {
-            min = temperature;
-        }
+    public void setMin(float min) {
+        this.min = min;
     }
 
     public int getWindowPercentage() {
@@ -81,46 +75,12 @@ public class DataStorage {
         this.windowPercentage = windowPercentage;
     }
 
-    public void calculateWindowPercentage(float temperature) {
-        float t = temperature;
-        float t1 = temperatureThresholdFirst;
-        float t2 = temperatureThresholdSecond;
-        if (t < t1) {
-            windowPercentage = 0;
-        } else if (t1 <= t && t <= t2) {
-            windowPercentage = (int) (((t - t1) / (t2 - t1)) * 99 + 1);
-        } else if (t > t2){
-            windowPercentage = 100;
-        }
-    }
-
     public State getState() {
         return state;
     }
 
     public void setState(State state) {
         this.state = state;
-    }
-
-    public void updateState(float temperature) {
-        if (state == State.ALARM) {
-            return;
-        }
-        if (temperature < temperatureThresholdFirst) {
-            state = State.NORMAL;
-        } else if (temperature >= temperatureThresholdFirst && temperature <= temperatureThresholdSecond) {
-            state = State.HOT;
-        } else if (temperature > temperatureThresholdSecond && state != State.TOO_HOT) {
-            state = State.TOO_HOT;
-            tooHotStartTime = System.currentTimeMillis();
-        }
-        if (state == State.TOO_HOT) {
-            long elapsedTime = System.currentTimeMillis() - tooHotStartTime;
-            if (elapsedTime >= alarmDelay) {
-                state = State.ALARM;
-
-            }
-        }
     }
 
     public Mode getMode() {
@@ -131,12 +91,7 @@ public class DataStorage {
         this.mode = mode;
     }
 
-    public synchronized Mode toggleMode() {
-        if (mode == Mode.MANUAL) {
-            mode = Mode.AUTOMATIC;
-        } else {
-            mode = Mode.MANUAL;
-        }
-        return mode;
+    public BlockingQueue<Float> getTemperatureQueue() {
+        return temperatureQueue;
     }
 }
