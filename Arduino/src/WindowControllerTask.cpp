@@ -21,10 +21,7 @@ void WindowControllerTask::init(){
 
   lcd->init();
   window->openPercentage(0);
-  mode = automatic;
-  lcd->updateMode("Automatic");
-  lastMode = Automatic ;
-  lcd->updatePercentage(percentage); 
+  goInAutomaticMode();
 
   isButtonAlreadyPressed = false;
 }
@@ -35,21 +32,15 @@ void WindowControllerTask::tick(){
  getDataFromSerial();
 
  switch(mode){
+
   case automatic:
-    if(lastMode == Manual ){
-     goInAutomaticMode();
-    }
     updateWindowFromSerial();
     break;
 
   case manual:
-    if(lastMode == Automatic){
-     goInManualMode();
-    }
-     updateTemperature();
+    updateTemperature();
 
     int potPercentage = potentiometer->getPercentageValue();
-
     if(potPercentage != lastPotPercentage){
      lastPotPercentage = potPercentage;
      updateWindowFromPotentiometer();
@@ -86,9 +77,9 @@ void WindowControllerTask::getDataFromSerial(){
    temperature = value.toInt();
   }else if(tag == "M"){
     if(value == "automatic"){
-     mode = automatic;
+      goInAutomaticMode();
     }else{
-      mode = manual;
+      goInManualMode();
     }
     }else if(tag == "P"){
       percentage = value.toInt();
@@ -103,9 +94,9 @@ void WindowControllerTask::changeModeOnButtonPress(){
  bool buttonIsPressed = btn->isPressed();
  if(buttonIsPressed && !isButtonAlreadyPressed){
   if(mode == automatic){
-   mode = manual;
+   goInManualMode();
   }else{
-   mode = automatic;
+   goInAutomaticMode();
   }
    isButtonAlreadyPressed = true;
   }else if(!buttonIsPressed){
@@ -127,16 +118,16 @@ void WindowControllerTask::updateWindowFromPotentiometer(){
 }
  
 void WindowControllerTask::goInManualMode(){
-  lastMode = Manual ;
   lcd->updateMode("Manual");
   lcd->updatePercentage(percentage);
   lcd->updateTemp(temperature);
   MsgService.sendMsg("M:manual");
+  mode = manual;
 }
 
 void WindowControllerTask::goInAutomaticMode(){
-  lastMode = Automatic ;
   lcd->updateMode("Automatic");
   lcd->updatePercentage(percentage);
   MsgService.sendMsg("M:automatic");
+  mode=automatic;
 }

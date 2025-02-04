@@ -14,7 +14,6 @@ class WindowControllerTask{
   int servo_pin;
 
   enum {automatic, manual} mode;
-  enum {Automatic, Manual} lastMode;
 
   Button* btn;
   ServoMotor* window;
