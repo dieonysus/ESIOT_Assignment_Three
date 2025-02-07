@@ -1,10 +1,8 @@
-package com.example.control_unit;
+package com.example.control_unit.pojo;
 
 import com.example.control_unit.enums.Mode;
 import com.example.control_unit.enums.State;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 

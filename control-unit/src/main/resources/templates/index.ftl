@@ -77,7 +77,7 @@
                         body: JSON.stringify({ percentage: value })
                     });
                 } catch (error) {
-                    console.error("Ошибка при обновлении windowPercentage:", error);
+                    console.error("Error updating windowPercentage:", error);
                 }
             }
 
@@ -137,7 +137,7 @@
                 clearTimeout(sliderTimeout); // Сбрасываем предыдущий таймер
                 sliderTimeout = setTimeout(() => {
                     updateWindowPercentage(value); // Отправляем только после задержки
-                }, 500);
+                }, 500); //check
             }
 
 
@@ -156,7 +156,7 @@
                     document.getElementById("windowPercentage").innerText = newData;
                     document.getElementById("windowSlider").value = newData;
                 }
-            }, 1000);
+            }, 1000); //check
         </script>
 
 

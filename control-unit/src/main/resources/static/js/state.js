@@ -3,6 +3,7 @@ async function fetchState() {
     const data = await response.json();
     return data;
 }
+
 setInterval(async () => {
     const newData = await fetchState();
     document.getElementById('state').innerText = newData;

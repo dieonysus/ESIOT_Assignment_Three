@@ -1,6 +1,6 @@
 package com.example.control_unit.services;
 
-import com.example.control_unit.DataStorage;
+import com.example.control_unit.pojo.DataStorage;
 import com.example.control_unit.mqtt.MqttConfig;
 import org.springframework.stereotype.Service;
 

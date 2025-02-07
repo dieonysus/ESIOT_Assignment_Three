@@ -1,6 +1,6 @@
 package com.example.control_unit.services;
 
-import com.example.control_unit.DataStorage;
+import com.example.control_unit.pojo.DataStorage;
 import com.example.control_unit.enums.Mode;
 import com.example.control_unit.serial.CommChannel;
 import com.example.control_unit.serial.SerialCommChannel;

@@ -1,6 +1,6 @@
 package com.example.control_unit.services;
 
-import com.example.control_unit.DataStorage;
+import com.example.control_unit.pojo.DataStorage;
 import com.example.control_unit.enums.Mode;
 import com.example.control_unit.enums.State;
 import org.springframework.stereotype.Service;
@@ -121,11 +121,9 @@ public class DataStorageService {
         dataStorage.addTemperatureToQueue(temperature);
     }
 
-
     public Mode getMode() {
         return dataStorage.getMode();
     }
-
 
     public List<Float> getTemperatureAsList() {
         return new ArrayList<>(dataStorage.getTemperatureQueue());

@@ -25,7 +25,7 @@ public class ArduinoTask {
                 } else if (msg.startsWith("P:")) {
                     arduinoService.receiveWindowPercentage(msg);
                 } else {
-                    System.out.println(msg);
+                    System.out.println("unknown message: " + msg);
                 }
             }
         } catch (Exception e) {
