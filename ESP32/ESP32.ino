@@ -4,7 +4,11 @@
 // Define default variables
 int TEMP_DELAY = 1000;
 
-// Definition temperature sensor pin
+// Define variables to check MQTT disconnection sooner
+unsigned long lastMQTTPing = 0;
+const int MQTT_CHECK_INTERVAL = 5000; 
+
+//Definition of temperature sensor pin
 #define TEMP_PIN 34
 
 // Definition of LED pins
@@ -47,7 +51,7 @@ void callback(char* TOPIC_STATE, byte* payload, unsigned int length) {
       TEMP_DELAY = 5000;  
   } else if (message == "HOT") {
       TEMP_DELAY = 3000;  
-  } else if (message == "TOO HOT") {
+  } else if (message == "TOO_HOT") {
       TEMP_DELAY = 1000;  
   }
     else if (message == "ALARM") {
@@ -101,6 +105,7 @@ void setup() {
   setupWiFi();
   client.setServer(MQTT_BROKER, MQTT_PORT);
   client.setCallback(callback);  
+  client.setKeepAlive(5);
   connectToMQTT();
 }
 
@@ -132,13 +137,26 @@ void getTemperature(){
 
 // Main loop function
 void loop() {
-  if (WiFi.status() != WL_CONNECTED && !client.connected()){
+  if (WiFi.status() != WL_CONNECTED){
     setLED("red");
     setupWiFi();
     connectToMQTT();
-  } else {
+  } 
+  if (!client.connected()) {
+    setLED("red"); 
+    connectToMQTT();
+  }
+  else {
     setLED("green");
     client.loop();
     getTemperature();
+  }
+
+  if (millis() - lastMQTTPing > MQTT_CHECK_INTERVAL) {
+    if (!client.publish("ping", "1")) {  
+      Serial.println("Error: MQTT Disconnected! Reconnecting...");
+      client.disconnect();  
+    }
+    lastMQTTPing = millis();
   }
 }
